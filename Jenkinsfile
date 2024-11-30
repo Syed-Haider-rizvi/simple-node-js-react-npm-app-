@@ -42,12 +42,12 @@ pipeline {
                         echo "Deploying to IIS is not supported on Unix-based systems"
                     } else {
                         bat """
-                        REM Copy React build files to the IIS root directory
-                        xcopy /E /H /Y build\\* C:\\inetpub\\wwwroot\\MyReactApp
-                        
-                        REM Copy files from network share (assuming the network path is valid)
-                        xcopy /E /H /Y \\\\172.16.14.79\\MyReactApp\\* C:\\inetpub\\wwwroot\\MyReactApp
-                        """
+REM Copy React build files to the IIS root directory
+robocopy build C:\\inetpub\\wwwroot\\MyReactApp /E /Z /R:3 /W:5
+REM Copy files from network share (assuming the network path is valid)
+robocopy \\\\172.16.14.79\\MyReactApp C:\\inetpub\\wwwroot\\MyReactApp /E /Z /R:3 /W:5
+"""
+
                     }
                 }
             }
