@@ -37,7 +37,7 @@ pipeline {
     }
 }
     
-    post {
+        {  post {
         always {
             echo 'Deployment completed.'
         }
