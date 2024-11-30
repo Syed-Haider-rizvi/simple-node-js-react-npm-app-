@@ -1,31 +1,42 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:6-alpine'
-            args '-p 3000:3000'
-        }
-    }
-     environment {
-            CI = 'true'
-        }
+    agent any
     stages {
-        stage('Build') {
+        stage('Checkout Code') {
             steps {
-                sh 'npm install'
+                checkout scm
             }
         }
-        stage('Test') {
-                    steps {
-                        sh './jenkins/scripts/test.sh'
-                    }
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh 'npm install'  // For Unix-based systems
+                    bat 'npm install' // For Windows
                 }
-                stage('Deliver') {
-                            steps {
-                                sh './jenkins/scripts/deliver.sh'
-                                input message: 'Finished using the web site? (Click "Proceed" to continue)'
-                                sh './jenkins/scripts/kill.sh'
-                            }
-                        }
-
+            }
+        }
+        stage('Build React App') {
+            steps {
+                script {
+                    sh 'npm run build'  // For Unix-based systems
+                    bat 'npm run build' // For Windows
+                }
+            }
+        }
+        stage('Deploy to IIS') {
+            steps {
+                script {
+                    // Replace below paths with actual deployment paths
+                    bat """
+                    xcopy /E /H /Y build\\* C:\\inetpub\\wwwroot\\MyReactApp
+                    xcopy /E /H /Y server.js C:\\inetpub\\wwwroot\\MyReactApp
+                    """
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Deployment completed.'
+        }
     }
 }
